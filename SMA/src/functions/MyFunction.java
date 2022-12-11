@@ -1,4 +1,4 @@
-package agent;
+package functions;
 
 public class MyFunction {
 
