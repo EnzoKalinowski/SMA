@@ -19,5 +19,6 @@ public abstract class Function {
 			res+=f(i);
 		}
 		return res;
+		
 	}
 }
