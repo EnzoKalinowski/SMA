@@ -57,7 +57,7 @@ public class ComputeAgent extends Agent{
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.INFORM);
 					reply.setContent(""+computeResult);
-					System.out.println(reply);
+//					System.out.println(reply);
 					send(reply);
 				}
 				block();
