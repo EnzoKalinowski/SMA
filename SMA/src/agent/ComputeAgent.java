@@ -66,12 +66,13 @@ public class ComputeAgent extends Agent{
 	}
 	
 	protected void takeDown() {
-		ServiceDescription sd = new ServiceDescription();
-		
-		sd.setType("calculator");
-		sd.setName(getLocalName());
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.removeServices(sd);
+//		ServiceDescription sd = new ServiceDescription();
+//		
+//		sd.setType("calculator");
+//		sd.setName(getLocalName());
+//		DFAgentDescription dfd = new DFAgentDescription();
+//		dfd.setName(getAID());
+//		dfd.removeServices(sd);
 	}
 	
 }
