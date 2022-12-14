@@ -28,7 +28,7 @@ public class ComputeAgent extends Agent{
 			fe.printStackTrace();
 		}
 		
-		addBehaviour(new CyclicBehaviour() {
+		addBehaviour(new CyclicBehaviour(this) {
 			
 			public void action() {
 				ACLMessage msg =receive();
@@ -59,6 +59,7 @@ public class ComputeAgent extends Agent{
 					reply.setContent(""+computeResult);
 //					System.out.println(reply);
 					send(reply);
+					
 				}
 				block();
 			}
