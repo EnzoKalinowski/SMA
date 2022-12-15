@@ -36,8 +36,18 @@ public class TestParallelAgent extends Agent {
 			fe.printStackTrace();
 		}
 		int nbAgent = agents.length;
-
-		//TODO faire le d�coupage 
+		double min=0 ,max=1 ,delta=0.1;
+		double intervalSize = (max - min) / nbAgent;
+		double aMin,aMax;
+		for(int i = 0; i < agents.length; i++) {
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			aMin=min+i*intervalSize;
+			aMax=min+(i+1-delta)*intervalSize;
+			msg.setContent("MyFunction"+aMin+","+aMax+","+delta);
+			msg.addReceiver(agents[i]);
+			send(msg);
+		}
+		
 		//TODO a faire le calcul en local sans behaviours !!!
 		//TODO afficher le premier temps 
 		//agnet.lenth --> nb d'agents retournes dispos 
