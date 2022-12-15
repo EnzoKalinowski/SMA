@@ -90,6 +90,7 @@ public class TestParallelAgent extends Agent {
 			private int i = 0;
 			
 			private double total = 0.0;
+			private ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			
 			@Override
 			public void action() {
