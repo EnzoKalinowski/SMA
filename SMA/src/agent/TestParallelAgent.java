@@ -6,68 +6,89 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.*;
 import jade.domain.*;
 
-public class TestParallelAgent extends Agent{
-	
-	  protected void setup() {
-		    // registering calculateur service for current agent
-		    ServiceDescription sd  = new ServiceDescription();
-		    try {
-		        sd.setType( getArguments()[0].toString() );
-		    }
-		    catch(Exception e){
-		        sd.setType( "calculateur" );
-		    }
-		    sd.setName( getLocalName() );
-		    register( sd );
+public class TestParallelAgent extends Agent {
 
-		    try {
-		      // looking for any service : return current agent
-		      DFAgentDescription dfd = new DFAgentDescription();
-		      DFAgentDescription[] result = DFService.search(this, dfd);
+	protected void setup() {
+		// registering calculateur service for current agent
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("calculateur");
 
-		      System.out.println("Generic search returns: " + result.length 
-		                         + " elements" );
-		      if (result.length>0)
-		        System.out.println(" " + result[0].getName() );
+		AID[] agents = null;
 
-		      // looking for calculateur service : return current agent
-		      sd  = new ServiceDescription();
-		      sd.setType( "calculateur" );
-		      dfd.addServices(sd);
-		      result = DFService.search(this, dfd);
-		      System.out.println("Search for calculateur: " + result.length + " elements" );
-		      if (result.length>0)
-		        System.out.println(" " + result[0].getName() );
+		try {
+			// looking for any service : return current agent
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.addServices(sd);
+			DFAgentDescription[] result = DFService.search(this, dfd);
+			agents = new AID[result.length];
+			for (int i = 0; i < result.length; i++) {
+				agents[i] = result[i].getName();
+			}
 
-		      // finally, looking for (non-existent) SELLER agent
-		      sd.setType( "seller" );
-		      result = DFService.search(this, dfd);
-		      if (result==null) System.out.println("Search1 returns null");
-		      else {
-		        System.out.println("Search for SELLER: " + result.length 
-		                           + " elements" );
-		        if (result.length>0)
-		          System.out.println(" " + result[0].getName() );
-		      }
-		    }
-		    catch (FIPAException fe) { fe.printStackTrace(); }
+			System.out.println("Generic search returns: " + agents.length + " elements");
 
-		    System.exit(0);
-		  }
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		int nbAgent = agents.length;
 
-		  /**
-		   * Useful wrapper for registering services : hides the usage of the
-		   * DFD
-		   */
-		  void register( ServiceDescription sd) {
-		    DFAgentDescription dfd = new DFAgentDescription();
-		    dfd.setName(getAID());
-		    dfd.addServices(sd);
+		//TODO faire le découpage 
+		//TODO a faire le calcul en local sans behaviours !!!
+		//TODO afficher le premier temps 
+		//agnet.lenth --> nb d'agents retournes dispos 
+		
+		//TODO nouveau timer 
+		long tstart = System.currentTimeMillis();
+		//TODO dans le for agent de i  on envoie le mess de requette 
+		
+		// !! ON PARLE DU RETOUR ICI 
+		
+		addBehaviour(new SimpleBehaviour() {
+			
+			private int i = 0;
+			
+			private double total = 0.0;
+			
+			@Override
+			public void action() {
+				// TODO Auto-generated method stub  ici fqire le recieve + calcul
+				
+			}
+			
+			@Override
+			public boolean done() {
+				// TODO Auto-generated method stub
+				return i >= nbAgent;
+			}
 
-		    try {
-		      DFService.register(this, dfd );
-		    }
-		    catch (FIPAException fe) { fe.printStackTrace(); }
-	  }
+			@Override
+			public int onEnd() {
+				long tfin = System.currentTimeMillis();
+				long duration = tstart-tfin;
+				System.out.println("duree = "+duration);
+				return 0;
+			}
+			
+			
+		});
+		
+		
+		System.exit(0);
+	}
+
+	/**
+	 * Useful wrapper for registering services : hides the usage of the DFD
+	 */
+	void register(ServiceDescription sd) {
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+
+		try {
+			DFService.register(this, dfd);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+	}
 
 }

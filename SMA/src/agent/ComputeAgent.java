@@ -5,7 +5,6 @@ import functions.MyFunction;
 import jade.core.behaviours.*;
 import jade.core.Agent;
 import jade.lang.acl.*;
-import jade.core.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 
@@ -60,20 +59,20 @@ public class ComputeAgent extends Agent{
 //					System.out.println(reply);
 					send(reply);
 					
+				} else {
+					block();
 				}
-				block();
 			}
 		});
 	}
 	
 	protected void takeDown() {
-//		ServiceDescription sd = new ServiceDescription();
-//		
-//		sd.setType("calculator");
-//		sd.setName(getLocalName());
-//		DFAgentDescription dfd = new DFAgentDescription();
-//		dfd.setName(getAID());
-//		dfd.removeServices(sd);
+		System.out.println("Deregister Compute Agent");
+		try {
+			DFService.deregister(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
