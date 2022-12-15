@@ -1,6 +1,10 @@
 package functions;
 
-
+/**
+ * 
+ * @brief Representation of a function
+ *
+ */
 public abstract class Function {
 	public final double min;
 	public final double max;

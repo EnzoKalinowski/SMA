@@ -6,6 +6,11 @@ import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.*;
 import jade.domain.*;
 
+/**
+ * 
+ * @brief Agent calling ComputeAgents for compute sub-integrals and calculate integral to compare computing speed
+ *
+ */
 public class TestParallelAgent extends Agent {
 
 	protected void setup() {
@@ -32,7 +37,7 @@ public class TestParallelAgent extends Agent {
 		}
 		int nbAgent = agents.length;
 
-		//TODO faire le découpage 
+		//TODO faire le dï¿½coupage 
 		//TODO a faire le calcul en local sans behaviours !!!
 		//TODO afficher le premier temps 
 		//agnet.lenth --> nb d'agents retournes dispos 

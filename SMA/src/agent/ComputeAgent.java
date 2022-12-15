@@ -9,11 +9,19 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 
 
+/**
+ * 
+ * @brief Agent calculating integrals 
+ *
+ */
 public class ComputeAgent extends Agent{
 	protected Function f;
 	
+	/**
+	 * 
+	 */
 	protected void setup() {
-		
+		//registration to the service "calculator"
 		ServiceDescription sd = new ServiceDescription();
 		
 		sd.setType("calculator");
@@ -26,7 +34,7 @@ public class ComputeAgent extends Agent{
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		
+		//behaviour of waiting integral to compute
 		addBehaviour(new CyclicBehaviour(this) {
 			
 			public void action() {
@@ -57,7 +65,7 @@ public class ComputeAgent extends Agent{
 					reply.setPerformative(ACLMessage.INFORM);
 					reply.setContent(""+computeResult);
 //					System.out.println(reply);
-					send(reply);
+					send(reply);//reply the integral result
 					
 				} else {
 					block();
@@ -66,6 +74,7 @@ public class ComputeAgent extends Agent{
 		});
 	}
 	
+
 	protected void takeDown() {
 		System.out.println("Deregister Compute Agent");
 		try {
