@@ -2,19 +2,28 @@ package functions;
 
 /**
  * 
- * @brief Representation of a function
+ *  Representation of a function
  *
  */
 public abstract class Function {
+	/**
+	 * 
+	 */
 	public final double min;
+	/**
+	 * 
+	 */
 	public final double max;
+	/**
+	 * 
+	 */
 	public final double delta;
 	
 	/**
 	 * 
-	 * @param min
-	 * @param max
-	 * @param delta
+	 * @param min low bound of the integral
+	 * @param max upper bound of the integral
+	 * @param delta step of discretization
 	 */
 	public Function(double min, double max, double delta){
 		this.min=min;
@@ -24,8 +33,8 @@ public abstract class Function {
 	
 	/**
 	 * 
-	 * @param x
-	 * @return f(x)
+	 * @param x abscissa
+	 * @return f(x) ordinate
 	 */
 	public abstract double f(double x);
 	

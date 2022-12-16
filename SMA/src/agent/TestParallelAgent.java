@@ -11,7 +11,7 @@ import agent.ComputeAgent;
 import java.util.concurrent.TimeUnit;
 /**
  * 
- * @brief Agent calling ComputeAgents for compute sub-integrals and calculate integral to compare computing speed
+ *  Agent calling ComputeAgents for compute sub-integrals and calculate integral to compare computing speed
  *
  */
 public class TestParallelAgent extends Agent {
@@ -24,11 +24,10 @@ public class TestParallelAgent extends Agent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
-		// registering calculateur service for current agent
+		
+		//read agent arguments
 		Object[] arguments = getArguments();
-		
-		//cast les arguments function,min,max,delta
-		
+				
 		String function="";
 		double min=0,max=0,delta=0;
 		
@@ -39,17 +38,14 @@ public class TestParallelAgent extends Agent {
 			 delta = Double.parseDouble((String)arguments[3]);
 		}else {
 			throw new IllegalArgumentException("Unexpected value: " + arguments.toString());
-
 		}
 		
-		System.out.println(function+","+min+","+max+","+delta);
-		
-		
+		System.out.println("Arguments: "+function+","+min+","+max+","+delta);
 
 		AID[] agents = null;
-
+		
 		try {
-			// looking for any service : return current agent
+			// looking for calculator service : return current agent
 			DFAgentDescription dfd = new DFAgentDescription();
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("calculator");
@@ -60,19 +56,19 @@ public class TestParallelAgent extends Agent {
 			for (int i = 0; i < result.length; i++) {
 				agents[i] = result[i].getName();
 			}	
-
-		System.out.println("Generic search returns: " + agents.length + " elements");
-
+		System.out.println("Search returns: " + agents.length + " elements");
+		
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
 		int nbAgent = agents.length;
 		double intervalSize = (max - min) / nbAgent;
 		double aMin,aMax;
 		
+		//local computing 
 		long tstart = System.currentTimeMillis();
 		double resultLocal = 0;
-
 		for(int i = 0; i < agents.length; i++) {
 			aMin=min+i*intervalSize;
 			aMax=min+(i+1)*intervalSize-delta;
@@ -91,10 +87,11 @@ public class TestParallelAgent extends Agent {
 		}
 		long tend = System.currentTimeMillis();
 		long localComputeDuration = tend-tstart;
-		System.out.println("Résultat du calcul local:"+resultLocal);
-		System.out.println("Durée du calcul local: "+localComputeDuration);
 		
-
+		System.out.println("\nRésultat du calcul local:"+resultLocal);
+		System.out.println("Durée du calcul local: "+localComputeDuration+"\n");
+		
+		//distributed computing
 		long tStartDistrib = System.currentTimeMillis();
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 		
@@ -116,7 +113,7 @@ public class TestParallelAgent extends Agent {
 			
 			@Override
 			public void action() {
-				// TODO Auto-generated method stub 
+				//waiting for ComputeAgent replies
 				ACLMessage msg= receive();
 
                 if (msg!=null) {
@@ -131,16 +128,17 @@ public class TestParallelAgent extends Agent {
 			
 			@Override
 			public boolean done() {
-				// TODO Auto-generated method stub
+				//all agents replied
 				return i >= nbAgent;
 			}
 
 			@Override
 			public int onEnd() {
+				//result of distributed computing
 				long tEndDistrib = System.currentTimeMillis();
 				long distribComputeDuration = tEndDistrib-tStartDistrib;
-				System.out.println("Résultat du calcul distribué: "+total);
-				System.out.println("Durée calcul distribué "+distribComputeDuration);
+				System.out.println("\nRésultat du calcul distribué: "+total);
+				System.out.println("Durée calcul distribué "+distribComputeDuration+"\n");
 				return 0;
 			}			
 		});
