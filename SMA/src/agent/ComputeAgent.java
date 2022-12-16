@@ -64,19 +64,19 @@ public class ComputeAgent extends Agent{
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.INFORM);
 					reply.setContent(""+computeResult);
-					System.out.println(reply);
 					send(reply);//reply the integral result
-					
+
 				} else {
 					block();
 				}
 			}
 		});
+		
 	}
 	
 
 	protected void takeDown() {
-		System.out.println("Deregister Compute Agent");
+		System.out.println("Deregister ComputeAgent");
 		try {
 			DFService.deregister(this);
 		} catch (Exception e) {

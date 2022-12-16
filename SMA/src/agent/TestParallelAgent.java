@@ -8,6 +8,7 @@ import jade.lang.acl.*;
 import jade.domain.*;
 import functions.MyFunction;
 import agent.ComputeAgent;
+import java.util.concurrent.TimeUnit;
 /**
  * 
  * @brief Agent calling ComputeAgents for compute sub-integrals and calculate integral to compare computing speed
@@ -16,6 +17,13 @@ import agent.ComputeAgent;
 public class TestParallelAgent extends Agent {
 
 	protected void setup() {
+		//sleep 1 second for waiting ComputerAgent creation
+		try {
+			TimeUnit.SECONDS.sleep(1);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		// registering calculateur service for current agent
 		Object[] arguments = getArguments();
 		
@@ -29,6 +37,9 @@ public class TestParallelAgent extends Agent {
 			 min = Double.parseDouble((String)arguments[1]);
 			 max = Double.parseDouble((String)arguments[2]);
 			 delta = Double.parseDouble((String)arguments[3]);
+		}else {
+			throw new IllegalArgumentException("Unexpected value: " + arguments.toString());
+
 		}
 		
 		System.out.println(function+","+min+","+max+","+delta);
@@ -60,15 +71,15 @@ public class TestParallelAgent extends Agent {
 		double aMin,aMax;
 		
 		long tstart = System.currentTimeMillis();
-		double resultUn = 0;
+		double resultLocal = 0;
 
 		for(int i = 0; i < agents.length; i++) {
 			aMin=min+i*intervalSize;
-			aMax=min+(i+1-delta)*intervalSize;
+			aMax=min+(i+1)*intervalSize-delta;
 			switch (function) {
 				case "MyFunction": {
-					MyFunction f=new MyFunction(min, max, delta);
-					resultUn = resultUn + f.eval();
+					MyFunction f=new MyFunction(aMin, aMax, delta);
+					resultLocal = resultLocal + f.eval();
 	
 					break;
 				}
@@ -79,25 +90,22 @@ public class TestParallelAgent extends Agent {
 			
 		}
 		long tend = System.currentTimeMillis();
-		long tempsUn = tend-tstart;
-		System.out.println("Durée calcul standard = "+tempsUn);
+		long localComputeDuration = tend-tstart;
+		System.out.println("Résultat du calcul local:"+resultLocal);
+		System.out.println("Durée du calcul local: "+localComputeDuration);
 		
-		aMin = 0;
-		aMax = 0;
-		long tstartDeux = System.currentTimeMillis();
+
+		long tStartDistrib = System.currentTimeMillis();
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 		
-		System.out.println("Avant l'envoie aux agents");
 		for (int i = 0; i < agents.length; i++) { 
-			System.out.println("i:"+i);
 		    AID agentAid = agents[i]; 
-
+		    aMin=min+i*intervalSize;
+			aMax=min+(i+1)*intervalSize-delta;
 		    message = new ACLMessage(ACLMessage.INFORM);
-		    //message.setContent(generateMessageContent(agentArguments, range));
 		    message.setContent("MyFunction,"+aMin+","+aMax+","+delta);
 		    message.addReceiver(agentAid);
 		    send(message); 
-		    System.out.println("Messages envoyé à l'agent"+ i);
 	    }
 					
 		addBehaviour(new SimpleBehaviour() {
@@ -109,8 +117,8 @@ public class TestParallelAgent extends Agent {
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub 
-				
 				ACLMessage msg= receive();
+
                 if (msg!=null) {
                 	total += Double.parseDouble(msg.getContent());
                 	i+=1;
@@ -129,14 +137,13 @@ public class TestParallelAgent extends Agent {
 
 			@Override
 			public int onEnd() {
-				long tendDeux = System.currentTimeMillis();
-				long duration = tendDeux-tstartDeux;
-				System.out.println("Durée calcul distribué "+duration);
+				long tEndDistrib = System.currentTimeMillis();
+				long distribComputeDuration = tEndDistrib-tStartDistrib;
+				System.out.println("Résultat du calcul distribué: "+total);
+				System.out.println("Durée calcul distribué "+distribComputeDuration);
 				return 0;
 			}			
 		});
-	
-		System.exit(0);
 	}
 
 	/**
