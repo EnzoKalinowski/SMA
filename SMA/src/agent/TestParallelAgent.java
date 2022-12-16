@@ -90,14 +90,25 @@ public class TestParallelAgent extends Agent {
 			private int i = 0;
 			
 			private double total = 0.0;
-			private ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub  ici faire le recieve + calcul
 				// enlever cette erreur que je ne comprend pas !!!
-				total += Double.parseDouble(message.getContent());
-
+				
+				ACLMessage msg= receive();
+                if (msg!=null) {
+                	total += Double.parseDouble(msg.getContent());
+                }
+                else {
+                	block();
+                }
+                // block() is not necessary here, but it saves resources:
+                // the behaviour will not be scheduled until a message is received
+                // (which wakes up all behaviours)
+                
+                
+                
 				
 			}
 			
