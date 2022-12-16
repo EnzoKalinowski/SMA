@@ -39,6 +39,7 @@ public class ComputeAgent extends Agent{
 			
 			public void action() {
 				ACLMessage msg = receive();
+
 				if(msg!=null) {
 					System.out.println(" - "+ myAgent.getLocalName()+" <- "+ msg.getContent());
 					
@@ -47,7 +48,6 @@ public class ComputeAgent extends Agent{
 					double min = Double.parseDouble(splitMsg[1]);
 					double max = Double.parseDouble(splitMsg[2]);
 					double delta = Double.parseDouble(splitMsg[3]);
-					System.out.println(splitMsg[0]);
 					switch (splitMsg[0]) {
 					
 						case "MyFunction": {
@@ -64,7 +64,7 @@ public class ComputeAgent extends Agent{
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.INFORM);
 					reply.setContent(""+computeResult);
-//					System.out.println(reply);
+					System.out.println(reply);
 					send(reply);//reply the integral result
 					
 				} else {

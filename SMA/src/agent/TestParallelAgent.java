@@ -17,6 +17,22 @@ public class TestParallelAgent extends Agent {
 
 	protected void setup() {
 		// registering calculateur service for current agent
+		Object[] arguments = getArguments();
+		
+		//cast les arguments function,min,max,delta
+		
+		String function="";
+		double min=0,max=0,delta=0;
+		
+		if((arguments != null) && (arguments.length==4)) {
+			 function= (String)arguments[0];
+			 min = Double.parseDouble((String)arguments[1]);
+			 max = Double.parseDouble((String)arguments[2]);
+			 delta = Double.parseDouble((String)arguments[3]);
+		}
+		
+		System.out.println(function+","+min+","+max+","+delta);
+		
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("calculateur");
 
@@ -30,61 +46,58 @@ public class TestParallelAgent extends Agent {
 			agents = new AID[result.length];
 			for (int i = 0; i < result.length; i++) {
 				agents[i] = result[i].getName();
-			}
+		}	
 
-			System.out.println("Generic search returns: " + agents.length + " elements");
+		System.out.println("Generic search returns: " + agents.length + " elements");
 
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
 		int nbAgent = agents.length;
-		double min=0 ,max=1 ,delta=0.1;
 		double intervalSize = (max - min) / nbAgent;
 		double aMin,aMax;
 		
-		
-		for(int i = 0; i < agents.length; i++) {
-			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			aMin=min+i*intervalSize;
-			aMax=min+(i+1-delta)*intervalSize;
-			msg.setContent("MyFunction"+aMin+","+aMax+","+delta);
-			msg.addReceiver(agents[i]);
-			send(msg);
-		}
 		long tstart = System.currentTimeMillis();
-		//TODO a faire le calcul en local sans behaviours !!!
-		//TODO afficher le premier temps 
-		long tend = System.currentTimeMillis();
-		long tempsUn = tend-tstart;
-		System.out.println("duree une = "+tempsUn);
-		//agnet.lenth --> nb d'agents retournes dispos 
 		double resultUn = 0;
-		double resultDeux = 0;
+
 		for(int i = 0; i < agents.length; i++) {
 			aMin=min+i*intervalSize;
 			aMax=min+(i+1-delta)*intervalSize;
-			MyFunction f = new MyFunction(aMin,aMax,delta);
-			resultUn = resultUn + f.eval();
+			switch (function) {
+				case "MyFunction": {
+					MyFunction f=new MyFunction(min, max, delta);
+					resultUn = resultUn + f.eval();
+	
+					break;
+				}
+				default:
+					throw new IllegalArgumentException("Unexpected value: " + function);
+			}
+			
 			
 		}
+		long tend = System.currentTimeMillis();
+		long tempsUn = tend-tstart;
+		System.out.println("Durée calcul standard = "+tempsUn);
+		
 		aMin = 0;
 		aMax = 0;
-		//TODO nouveau timer 
 		long tstartDeux = System.currentTimeMillis();
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-		//TODO dans le for agent de i  on envoie le mess de requette 
+		
+		System.out.println("Avant l'envoie aux agents");
 		for (int i = 0; i < agents.length; i++) { 
+			System.out.println("i:"+i);
 		    AID agentAid = agents[i]; 
+
 		    message = new ACLMessage(ACLMessage.INFORM);
 		    //message.setContent(generateMessageContent(agentArguments, range));
 		    message.setContent("MyFunction,"+aMin+","+aMax+","+delta);
 		    message.addReceiver(agentAid);
 		    send(message); 
-		    }
-		long tendDeux = System.currentTimeMillis();
-		
-		// !! ON PARLE DU RETOUR ICI 
-		
+		    System.out.println("Messages envoyé à l'agent"+ i);
+	    }
+					
 		addBehaviour(new SimpleBehaviour() {
 			
 			private int i = 0;
@@ -93,22 +106,16 @@ public class TestParallelAgent extends Agent {
 			
 			@Override
 			public void action() {
-				// TODO Auto-generated method stub  ici faire le recieve + calcul
-				// enlever cette erreur que je ne comprend pas !!!
+				// TODO Auto-generated method stub 
 				
 				ACLMessage msg= receive();
                 if (msg!=null) {
                 	total += Double.parseDouble(msg.getContent());
+                	i+=1;
                 }
                 else {
                 	block();
                 }
-                // block() is not necessary here, but it saves resources:
-                // the behaviour will not be scheduled until a message is received
-                // (which wakes up all behaviours)
-                
-                
-                
 				
 			}
 			
@@ -120,16 +127,13 @@ public class TestParallelAgent extends Agent {
 
 			@Override
 			public int onEnd() {
-				long tfin = System.currentTimeMillis();
+				long tendDeux = System.currentTimeMillis();
 				long duration = tendDeux-tstartDeux;
-				System.out.println("duree deux = "+duration);
+				System.out.println("Durée calcul distribué "+duration);
 				return 0;
-			}
-			
-			
+			}			
 		});
-		
-		
+	
 		System.exit(0);
 	}
 
