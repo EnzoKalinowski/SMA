@@ -33,20 +33,22 @@ public class TestParallelAgent extends Agent {
 		
 		System.out.println(function+","+min+","+max+","+delta);
 		
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("calculateur");
+		
 
 		AID[] agents = null;
 
 		try {
 			// looking for any service : return current agent
 			DFAgentDescription dfd = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("calculator");
 			dfd.addServices(sd);
 			DFAgentDescription[] result = DFService.search(this, dfd);
 			agents = new AID[result.length];
+			
 			for (int i = 0; i < result.length; i++) {
 				agents[i] = result[i].getName();
-		}	
+			}	
 
 		System.out.println("Generic search returns: " + agents.length + " elements");
 
